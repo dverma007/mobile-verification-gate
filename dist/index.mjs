@@ -18,7 +18,7 @@ var MOBILE_VERIFICATION_GATE_COPY = {
   verifiedMessage: "Mobile login is now enabled for this account.",
   skipMessage: "No problem. We will remind you again the next time you sign in with email.",
   unverifiedLoginGuidance: "Sign in with email and we will help you verify your mobile number before you continue.",
-  profilePendingMessage: "Mobile login is not verified yet. After your next email sign-in, we will walk you through verification.",
+  profilePendingMessage: "Mobile login is not verified yet. After your next email sign-in, we\u2019ll walk you through verification.",
   profileEnabledMessage: "Your mobile phone number can be used to sign into {{productName}}.",
   requestCodeError: "Unable to start mobile verification right now.",
   verifyCodeError: "Unable to verify this code right now.",

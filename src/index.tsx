@@ -44,7 +44,7 @@ export const MOBILE_VERIFICATION_GATE_COPY: {
   unverifiedLoginGuidance:
     'Sign in with email and we will help you verify your mobile number before you continue.',
   profilePendingMessage:
-    'Mobile login is not verified yet. After your next email sign-in, we will walk you through verification.',
+    'Mobile login is not verified yet. After your next email sign-in, we’ll walk you through verification.',
   profileEnabledMessage:
     'Your mobile phone number can be used to sign into {{productName}}.',
   requestCodeError: 'Unable to start mobile verification right now.',
