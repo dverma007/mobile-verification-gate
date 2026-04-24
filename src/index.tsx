@@ -150,6 +150,14 @@ function toCssValue(value: number | string | undefined, fallback: string): strin
   return value || fallback;
 }
 
+function blurActiveElement(): void {
+  if (typeof document === 'undefined') return;
+  const activeElement = document.activeElement;
+  if (activeElement instanceof HTMLElement) {
+    activeElement.blur();
+  }
+}
+
 export type MobileVerificationGateProps<TUser = unknown> = {
   user?: MobileVerificationGateUser | null;
   isAuthenticated: boolean;
@@ -265,6 +273,7 @@ export function MobileVerificationGate<TUser = unknown>({
   const handleRequestCode = async () => {
     if (!normalizedMobile) return;
 
+    blurActiveElement();
     setIsSubmitting(true);
     setErrorMessage('');
     try {
@@ -306,6 +315,7 @@ export function MobileVerificationGate<TUser = unknown>({
   const handleVerify = async () => {
     if (!normalizedMobile || otp.length < 6) return;
 
+    blurActiveElement();
     setIsSubmitting(true);
     setErrorMessage('');
     try {
@@ -381,82 +391,97 @@ export function MobileVerificationGate<TUser = unknown>({
 
         {step === 'collect' ? (
           <>
-            <div style={{ marginTop: '20px' }}>
-              <label
-                htmlFor="mobile-verification-gate-phone"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}
-              >
-                {resolvedCopy.mobileLabel}
-              </label>
-              <input
-                id="mobile-verification-gate-phone"
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
-                value={formattedMobile}
-                onChange={(event) => {
-                  const nextValue = event.target.value;
-                  setMobile(nextValue);
-                  setFormattedMobile(formatPhone(nextValue));
-                  if (errorMessage) setErrorMessage('');
-                }}
-                placeholder="(555) 123-4567"
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  borderRadius: '12px',
-                  border: `1px solid ${resolvedTheme.borderColor}`,
-                  padding: '12px 14px',
-                  fontSize: '1rem',
-                }}
-              />
-            </div>
-            {errorMessage ? (
-              <p style={{ margin: '12px 0 0', color: '#B91C1C', fontSize: '0.9rem' }}>
-                {errorMessage}
-              </p>
-            ) : null}
-            <div
-              style={{
-                marginTop: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px',
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                void handleRequestCode();
               }}
             >
-              <button
-                type="button"
-                onClick={handleSkip}
+              <div style={{ marginTop: '20px' }}>
+                <label
+                  htmlFor="mobile-verification-gate-phone"
+                  style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}
+                >
+                  {resolvedCopy.mobileLabel}
+                </label>
+                <input
+                  id="mobile-verification-gate-phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  enterKeyHint="done"
+                  value={formattedMobile}
+                  onChange={(event) => {
+                    const nextValue = event.target.value;
+                    setMobile(nextValue);
+                    setFormattedMobile(formatPhone(nextValue));
+                    if (errorMessage) setErrorMessage('');
+                  }}
+                  placeholder="(555) 123-4567"
+                  style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
+                    borderRadius: '12px',
+                    border: `1px solid ${resolvedTheme.borderColor}`,
+                    padding: '12px 14px',
+                    fontSize: '1rem',
+                  }}
+                />
+              </div>
+              {errorMessage ? (
+                <p style={{ margin: '12px 0 0', color: '#B91C1C', fontSize: '0.9rem' }}>
+                  {errorMessage}
+                </p>
+              ) : null}
+              <div
                 style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  color: resolvedTheme.mutedTextColor,
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
+                  marginTop: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
                 }}
               >
-                {resolvedCopy.skipLabel}
-              </button>
-              <button
-                type="button"
-                onClick={handleRequestCode}
-                disabled={isSubmitting || normalizedMobile.length < 10}
-                style={{
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '12px 16px',
-                  fontWeight: 600,
-                  color: '#FFFFFF',
-                  backgroundColor: resolvedTheme.accentColor,
-                  opacity: isSubmitting || normalizedMobile.length < 10 ? 0.6 : 1,
-                  cursor: isSubmitting || normalizedMobile.length < 10 ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {isSubmitting ? resolvedCopy.sendingCodeLabel : resolvedCopy.sendCodeLabel}
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                    color: resolvedTheme.mutedTextColor,
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {resolvedCopy.skipLabel}
+                </button>
+                <button
+                  type="submit"
+                  onTouchEnd={() => {
+                    blurActiveElement();
+                  }}
+                  onPointerDown={() => {
+                    blurActiveElement();
+                  }}
+                  disabled={isSubmitting || normalizedMobile.length < 10}
+                  style={{
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '12px 16px',
+                    fontWeight: 600,
+                    color: '#FFFFFF',
+                    backgroundColor: resolvedTheme.accentColor,
+                    opacity: isSubmitting || normalizedMobile.length < 10 ? 0.6 : 1,
+                    cursor: isSubmitting || normalizedMobile.length < 10 ? 'not-allowed' : 'pointer',
+                    touchAction: 'manipulation',
+                    WebkitAppearance: 'none',
+                  }}
+                >
+                  {isSubmitting ? resolvedCopy.sendingCodeLabel : resolvedCopy.sendCodeLabel}
+                </button>
+              </div>
+            </form>
           </>
         ) : (
           <>
@@ -466,98 +491,115 @@ export function MobileVerificationGate<TUser = unknown>({
                 {resolvedCopy.otpDescription}
               </p>
             </div>
-            <div style={{ marginTop: '16px' }}>
-              <label
-                htmlFor="mobile-verification-gate-otp"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}
-              >
-                {resolvedCopy.otpLabel}
-              </label>
-              <input
-                id="mobile-verification-gate-otp"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                value={otp}
-                onChange={(event) => {
-                  setOtp(event.target.value.replace(/\D/g, '').slice(0, 6));
-                  if (errorMessage) setErrorMessage('');
-                }}
-                placeholder={resolvedCopy.otpPlaceholder}
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  borderRadius: '12px',
-                  border: `1px solid ${resolvedTheme.borderColor}`,
-                  padding: '12px 14px',
-                  fontSize: '1rem',
-                  letterSpacing: '0.2em',
-                }}
-              />
-            </div>
-            {errorMessage ? (
-              <p style={{ margin: '12px 0 0', color: '#B91C1C', fontSize: '0.9rem' }}>
-                {errorMessage}
-              </p>
-            ) : null}
-            <div
-              style={{
-                marginTop: '20px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '12px',
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                void handleVerify();
               }}
             >
-              <button
-                type="button"
-                onClick={handleSkip}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 0,
-                  color: resolvedTheme.mutedTextColor,
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                }}
-              >
-                {resolvedCopy.skipLabel}
-              </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <button
-                  type="button"
-                  onClick={handleRequestCode}
-                  disabled={isSubmitting}
+              <div style={{ marginTop: '16px' }}>
+                <label
+                  htmlFor="mobile-verification-gate-otp"
+                  style={{ display: 'block', fontWeight: 600, marginBottom: '8px' }}
+                >
+                  {resolvedCopy.otpLabel}
+                </label>
+                <input
+                  id="mobile-verification-gate-otp"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  enterKeyHint="done"
+                  value={otp}
+                  onChange={(event) => {
+                    setOtp(event.target.value.replace(/\D/g, '').slice(0, 6));
+                    if (errorMessage) setErrorMessage('');
+                  }}
+                  placeholder={resolvedCopy.otpPlaceholder}
                   style={{
+                    width: '100%',
+                    boxSizing: 'border-box',
                     borderRadius: '12px',
                     border: `1px solid ${resolvedTheme.borderColor}`,
                     padding: '12px 14px',
-                    backgroundColor: 'transparent',
-                    color: resolvedTheme.textColor,
-                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    fontSize: '1rem',
+                    letterSpacing: '0.2em',
                   }}
-                >
-                  {resolvedCopy.resendLabel}
-                </button>
+                />
+              </div>
+              {errorMessage ? (
+                <p style={{ margin: '12px 0 0', color: '#B91C1C', fontSize: '0.9rem' }}>
+                  {errorMessage}
+                </p>
+              ) : null}
+              <div
+                style={{
+                  marginTop: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '12px',
+                }}
+              >
                 <button
                   type="button"
-                  onClick={handleVerify}
-                  disabled={isSubmitting || otp.length < 6}
+                  onClick={handleSkip}
                   style={{
+                    background: 'transparent',
                     border: 'none',
-                    borderRadius: '12px',
-                    padding: '12px 16px',
-                    fontWeight: 600,
-                    color: '#FFFFFF',
-                    backgroundColor: resolvedTheme.accentColor,
-                    opacity: isSubmitting || otp.length < 6 ? 0.6 : 1,
-                    cursor: isSubmitting || otp.length < 6 ? 'not-allowed' : 'pointer',
+                    padding: 0,
+                    color: resolvedTheme.mutedTextColor,
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
                   }}
                 >
-                  {isSubmitting ? resolvedCopy.verifyingCodeLabel : resolvedCopy.sendCodeLabel}
+                  {resolvedCopy.skipLabel}
                 </button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={handleRequestCode}
+                    disabled={isSubmitting}
+                    style={{
+                      borderRadius: '12px',
+                      border: `1px solid ${resolvedTheme.borderColor}`,
+                      padding: '12px 14px',
+                      backgroundColor: 'transparent',
+                      color: resolvedTheme.textColor,
+                      cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                      touchAction: 'manipulation',
+                      WebkitAppearance: 'none',
+                    }}
+                  >
+                    {resolvedCopy.resendLabel}
+                  </button>
+                  <button
+                    type="submit"
+                    onTouchEnd={() => {
+                      blurActiveElement();
+                    }}
+                    onPointerDown={() => {
+                      blurActiveElement();
+                    }}
+                    disabled={isSubmitting || otp.length < 6}
+                    style={{
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '12px 16px',
+                      fontWeight: 600,
+                      color: '#FFFFFF',
+                      backgroundColor: resolvedTheme.accentColor,
+                      opacity: isSubmitting || otp.length < 6 ? 0.6 : 1,
+                      cursor: isSubmitting || otp.length < 6 ? 'not-allowed' : 'pointer',
+                      touchAction: 'manipulation',
+                      WebkitAppearance: 'none',
+                    }}
+                  >
+                    {isSubmitting ? resolvedCopy.verifyingCodeLabel : resolvedCopy.sendCodeLabel}
+                  </button>
+                </div>
               </div>
-            </div>
+            </form>
           </>
         )}
       </div>

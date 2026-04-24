@@ -93,6 +93,13 @@ function toCssValue(value, fallback) {
   if (typeof value === "number") return `${value}px`;
   return value || fallback;
 }
+function blurActiveElement() {
+  if (typeof document === "undefined") return;
+  const activeElement = document.activeElement;
+  if (activeElement instanceof HTMLElement) {
+    activeElement.blur();
+  }
+}
 function MobileVerificationGate({
   user,
   isAuthenticated,
@@ -176,6 +183,7 @@ function MobileVerificationGate({
   const handleRequestCode = async () => {
     var _a2, _b, _c;
     if (!normalizedMobile) return;
+    blurActiveElement();
     setIsSubmitting(true);
     setErrorMessage("");
     try {
@@ -212,6 +220,7 @@ function MobileVerificationGate({
   const handleVerify = async () => {
     var _a2, _b;
     if (!normalizedMobile || otp.length < 6) return;
+    blurActiveElement();
     setIsSubmitting(true);
     setErrorMessage("");
     try {
@@ -282,197 +291,235 @@ function MobileVerificationGate({
                 children: resolvedCopy.description
               }
             ),
-            step === "collect" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: "20px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  "label",
-                  {
-                    htmlFor: "mobile-verification-gate-phone",
-                    style: { display: "block", fontWeight: 600, marginBottom: "8px" },
-                    children: resolvedCopy.mobileLabel
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  "input",
-                  {
-                    id: "mobile-verification-gate-phone",
-                    type: "tel",
-                    inputMode: "tel",
-                    autoComplete: "tel",
-                    value: formattedMobile,
-                    onChange: (event) => {
-                      const nextValue = event.target.value;
-                      setMobile(nextValue);
-                      setFormattedMobile(formatPhone(nextValue));
-                      if (errorMessage) setErrorMessage("");
-                    },
-                    placeholder: "(555) 123-4567",
-                    style: {
-                      width: "100%",
-                      boxSizing: "border-box",
-                      borderRadius: "12px",
-                      border: `1px solid ${resolvedTheme.borderColor}`,
-                      padding: "12px 14px",
-                      fontSize: "1rem"
-                    }
-                  }
-                )
-              ] }),
-              errorMessage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: "12px 0 0", color: "#B91C1C", fontSize: "0.9rem" }, children: errorMessage }) : null,
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-                "div",
-                {
-                  style: {
-                    marginTop: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "12px"
-                  },
-                  children: [
+            step === "collect" ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(import_jsx_runtime.Fragment, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+              "form",
+              {
+                onSubmit: (event) => {
+                  event.preventDefault();
+                  void handleRequestCode();
+                },
+                children: [
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: "20px" }, children: [
                     /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                      "button",
+                      "label",
                       {
-                        type: "button",
-                        onClick: handleSkip,
-                        style: {
-                          background: "transparent",
-                          border: "none",
-                          padding: 0,
-                          color: resolvedTheme.mutedTextColor,
-                          textDecoration: "underline",
-                          cursor: "pointer"
-                        },
-                        children: resolvedCopy.skipLabel
+                        htmlFor: "mobile-verification-gate-phone",
+                        style: { display: "block", fontWeight: 600, marginBottom: "8px" },
+                        children: resolvedCopy.mobileLabel
                       }
                     ),
                     /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                      "button",
+                      "input",
                       {
-                        type: "button",
-                        onClick: handleRequestCode,
-                        disabled: isSubmitting || normalizedMobile.length < 10,
-                        style: {
-                          border: "none",
-                          borderRadius: "12px",
-                          padding: "12px 16px",
-                          fontWeight: 600,
-                          color: "#FFFFFF",
-                          backgroundColor: resolvedTheme.accentColor,
-                          opacity: isSubmitting || normalizedMobile.length < 10 ? 0.6 : 1,
-                          cursor: isSubmitting || normalizedMobile.length < 10 ? "not-allowed" : "pointer"
+                        id: "mobile-verification-gate-phone",
+                        type: "tel",
+                        inputMode: "tel",
+                        autoComplete: "tel",
+                        enterKeyHint: "done",
+                        value: formattedMobile,
+                        onChange: (event) => {
+                          const nextValue = event.target.value;
+                          setMobile(nextValue);
+                          setFormattedMobile(formatPhone(nextValue));
+                          if (errorMessage) setErrorMessage("");
                         },
-                        children: isSubmitting ? resolvedCopy.sendingCodeLabel : resolvedCopy.sendCodeLabel
+                        placeholder: "(555) 123-4567",
+                        style: {
+                          width: "100%",
+                          boxSizing: "border-box",
+                          borderRadius: "12px",
+                          border: `1px solid ${resolvedTheme.borderColor}`,
+                          padding: "12px 14px",
+                          fontSize: "1rem"
+                        }
                       }
                     )
-                  ]
-                }
-              )
-            ] }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
+                  ] }),
+                  errorMessage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: "12px 0 0", color: "#B91C1C", fontSize: "0.9rem" }, children: errorMessage }) : null,
+                  /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+                    "div",
+                    {
+                      style: {
+                        marginTop: "20px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "12px"
+                      },
+                      children: [
+                        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                          "button",
+                          {
+                            type: "button",
+                            onClick: handleSkip,
+                            style: {
+                              background: "transparent",
+                              border: "none",
+                              padding: 0,
+                              color: resolvedTheme.mutedTextColor,
+                              textDecoration: "underline",
+                              cursor: "pointer"
+                            },
+                            children: resolvedCopy.skipLabel
+                          }
+                        ),
+                        /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                          "button",
+                          {
+                            type: "submit",
+                            onTouchEnd: () => {
+                              blurActiveElement();
+                            },
+                            onPointerDown: () => {
+                              blurActiveElement();
+                            },
+                            disabled: isSubmitting || normalizedMobile.length < 10,
+                            style: {
+                              border: "none",
+                              borderRadius: "12px",
+                              padding: "12px 16px",
+                              fontWeight: 600,
+                              color: "#FFFFFF",
+                              backgroundColor: resolvedTheme.accentColor,
+                              opacity: isSubmitting || normalizedMobile.length < 10 ? 0.6 : 1,
+                              cursor: isSubmitting || normalizedMobile.length < 10 ? "not-allowed" : "pointer",
+                              touchAction: "manipulation",
+                              WebkitAppearance: "none"
+                            },
+                            children: isSubmitting ? resolvedCopy.sendingCodeLabel : resolvedCopy.sendCodeLabel
+                          }
+                        )
+                      ]
+                    }
+                  )
+                ]
+              }
+            ) }) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
               /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: "20px" }, children: [
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: 0, fontWeight: 600 }, children: resolvedCopy.otpTitle }),
                 /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: "6px 0 0", color: resolvedTheme.mutedTextColor }, children: resolvedCopy.otpDescription })
               ] }),
-              /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: "16px" }, children: [
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  "label",
-                  {
-                    htmlFor: "mobile-verification-gate-otp",
-                    style: { display: "block", fontWeight: 600, marginBottom: "8px" },
-                    children: resolvedCopy.otpLabel
-                  }
-                ),
-                /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                  "input",
-                  {
-                    id: "mobile-verification-gate-otp",
-                    type: "tel",
-                    inputMode: "numeric",
-                    autoComplete: "one-time-code",
-                    value: otp,
-                    onChange: (event) => {
-                      setOtp(event.target.value.replace(/\D/g, "").slice(0, 6));
-                      if (errorMessage) setErrorMessage("");
-                    },
-                    placeholder: resolvedCopy.otpPlaceholder,
-                    style: {
-                      width: "100%",
-                      boxSizing: "border-box",
-                      borderRadius: "12px",
-                      border: `1px solid ${resolvedTheme.borderColor}`,
-                      padding: "12px 14px",
-                      fontSize: "1rem",
-                      letterSpacing: "0.2em"
-                    }
-                  }
-                )
-              ] }),
-              errorMessage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: "12px 0 0", color: "#B91C1C", fontSize: "0.9rem" }, children: errorMessage }) : null,
               /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
-                "div",
+                "form",
                 {
-                  style: {
-                    marginTop: "20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "12px"
+                  onSubmit: (event) => {
+                    event.preventDefault();
+                    void handleVerify();
                   },
                   children: [
-                    /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                      "button",
-                      {
-                        type: "button",
-                        onClick: handleSkip,
-                        style: {
-                          background: "transparent",
-                          border: "none",
-                          padding: 0,
-                          color: resolvedTheme.mutedTextColor,
-                          textDecoration: "underline",
-                          cursor: "pointer"
-                        },
-                        children: resolvedCopy.skipLabel
-                      }
-                    ),
-                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { marginTop: "16px" }, children: [
                       /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                        "button",
+                        "label",
                         {
-                          type: "button",
-                          onClick: handleRequestCode,
-                          disabled: isSubmitting,
-                          style: {
-                            borderRadius: "12px",
-                            border: `1px solid ${resolvedTheme.borderColor}`,
-                            padding: "12px 14px",
-                            backgroundColor: "transparent",
-                            color: resolvedTheme.textColor,
-                            cursor: isSubmitting ? "not-allowed" : "pointer"
-                          },
-                          children: resolvedCopy.resendLabel
+                          htmlFor: "mobile-verification-gate-otp",
+                          style: { display: "block", fontWeight: 600, marginBottom: "8px" },
+                          children: resolvedCopy.otpLabel
                         }
                       ),
                       /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
-                        "button",
+                        "input",
                         {
-                          type: "button",
-                          onClick: handleVerify,
-                          disabled: isSubmitting || otp.length < 6,
-                          style: {
-                            border: "none",
-                            borderRadius: "12px",
-                            padding: "12px 16px",
-                            fontWeight: 600,
-                            color: "#FFFFFF",
-                            backgroundColor: resolvedTheme.accentColor,
-                            opacity: isSubmitting || otp.length < 6 ? 0.6 : 1,
-                            cursor: isSubmitting || otp.length < 6 ? "not-allowed" : "pointer"
+                          id: "mobile-verification-gate-otp",
+                          type: "tel",
+                          inputMode: "numeric",
+                          autoComplete: "one-time-code",
+                          enterKeyHint: "done",
+                          value: otp,
+                          onChange: (event) => {
+                            setOtp(event.target.value.replace(/\D/g, "").slice(0, 6));
+                            if (errorMessage) setErrorMessage("");
                           },
-                          children: isSubmitting ? resolvedCopy.verifyingCodeLabel : resolvedCopy.sendCodeLabel
+                          placeholder: resolvedCopy.otpPlaceholder,
+                          style: {
+                            width: "100%",
+                            boxSizing: "border-box",
+                            borderRadius: "12px",
+                            border: `1px solid ${resolvedTheme.borderColor}`,
+                            padding: "12px 14px",
+                            fontSize: "1rem",
+                            letterSpacing: "0.2em"
+                          }
                         }
                       )
-                    ] })
+                    ] }),
+                    errorMessage ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { style: { margin: "12px 0 0", color: "#B91C1C", fontSize: "0.9rem" }, children: errorMessage }) : null,
+                    /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(
+                      "div",
+                      {
+                        style: {
+                          marginTop: "20px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "12px"
+                        },
+                        children: [
+                          /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                            "button",
+                            {
+                              type: "button",
+                              onClick: handleSkip,
+                              style: {
+                                background: "transparent",
+                                border: "none",
+                                padding: 0,
+                                color: resolvedTheme.mutedTextColor,
+                                textDecoration: "underline",
+                                cursor: "pointer"
+                              },
+                              children: resolvedCopy.skipLabel
+                            }
+                          ),
+                          /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { style: { display: "flex", alignItems: "center", gap: "8px" }, children: [
+                            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: handleRequestCode,
+                                disabled: isSubmitting,
+                                style: {
+                                  borderRadius: "12px",
+                                  border: `1px solid ${resolvedTheme.borderColor}`,
+                                  padding: "12px 14px",
+                                  backgroundColor: "transparent",
+                                  color: resolvedTheme.textColor,
+                                  cursor: isSubmitting ? "not-allowed" : "pointer",
+                                  touchAction: "manipulation",
+                                  WebkitAppearance: "none"
+                                },
+                                children: resolvedCopy.resendLabel
+                              }
+                            ),
+                            /* @__PURE__ */ (0, import_jsx_runtime.jsx)(
+                              "button",
+                              {
+                                type: "submit",
+                                onTouchEnd: () => {
+                                  blurActiveElement();
+                                },
+                                onPointerDown: () => {
+                                  blurActiveElement();
+                                },
+                                disabled: isSubmitting || otp.length < 6,
+                                style: {
+                                  border: "none",
+                                  borderRadius: "12px",
+                                  padding: "12px 16px",
+                                  fontWeight: 600,
+                                  color: "#FFFFFF",
+                                  backgroundColor: resolvedTheme.accentColor,
+                                  opacity: isSubmitting || otp.length < 6 ? 0.6 : 1,
+                                  cursor: isSubmitting || otp.length < 6 ? "not-allowed" : "pointer",
+                                  touchAction: "manipulation",
+                                  WebkitAppearance: "none"
+                                },
+                                children: isSubmitting ? resolvedCopy.verifyingCodeLabel : resolvedCopy.sendCodeLabel
+                              }
+                            )
+                          ] })
+                        ]
+                      }
+                    )
                   ]
                 }
               )

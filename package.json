@@ -1,6 +1,6 @@
 {
   "name": "@dverma007/mobile-verification-gate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Shared post-login mobile verification gate for Agent CoPilot and Indigo Sky",
   "license": "MIT",
   "main": "dist/index.js",
